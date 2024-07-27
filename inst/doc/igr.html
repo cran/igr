@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Irish Grid References in R</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Irish Grid References in R</h1>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The Irish Grid (<a href="https://epsg.io/29903">EPSG:29903</a>) is a
+coordinate reference system spanning the island of Ireland. Created by
+the Ordnance Survey Ireland (now <a href="https://www.tailte.ie">Tailte
+Éireann</a>) and <a href="https://www.nidirect.gov.uk/campaigns/ordnance-survey-of-northern-ireland">Ordnance
+Survey of Northern Ireland</a>, locations within the Irish Grid are
+defined by an X and Y coordinate.</p>
+<p>Irish grid references are an alternative way of recording locations
+on the Irish Grid. An Irish grid reference consists of a letter,
+optionally followed by an easting and northing. The letter (e.g. “N”)
+refers to a particular 100 km square on the Irish Grid. There are 25
+such 100 km squares - the letter “I” is skipped. The easting and
+northing refer to a square within the 100 km square. An Irish grid
+reference with a 1-digit easting and northing (e.g. “N85”) refers to a
+particular 10 km square wtihin the 100 km square “N”. A 5-digit easting
+and northing (e.g. “N 12345 67890”) refers to a particular 1 m
+square.</p>
+<p>There are many R packages facilitating <a href="https://cran.r-project.org/view=Spatial">spatial data analysis and
+visualisation</a>. The igr package is designed to simplify using
+datasets containing Irish grid references in R. It translates Irish grid
+references to and from Irish Grid coordinates or sf objects that other R
+packages can work with. The igr package supports precisions of Irish
+grid reference in multiples of ten from 1 m to 100 km, mixes of
+precision, and Irish grid references with or without whitespace between
+letter, easting and northing.</p>
+<p>When converting Irish grid references to point locations (using
+<code>igr_to_ig()</code>, or <code>st_igr_as_sf()</code> with the
+default <code>polygons=FALSE</code>), the south west corners of the
+relevant Irish Grid squares are returned. When converting to polygons
+(using <code>st_igr_as_sf()</code> with <code>polygons=TRUE</code>), the
+polygons returned span the entire square of each grid reference.</p>
+<p>The functions <code>st_igr_as_sf()</code> and
+<code>st_irishgridrefs()</code> convert to and from <a href="https://r-spatial.github.io/sf/">sf</a> (simple feature) objects
+in any coordinate reference system.</p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>To install the production version of igr from CRAN:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;igr&quot;</span>)</span></code></pre></div>
+<p>To install the development version of igr from GitHub:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Install remotes package if needed</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Install development version of igr package from GitHub</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;digitalnature-ie/igr&quot;</span>)</span></code></pre></div>
+</div>
+<div id="loading-the-package" class="section level2">
+<h2>Loading the package</h2>
+<p>The igr package is loaded in the normal way:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(igr)</span></code></pre></div>
+</div>
+<div id="checking-irish-grid-references" class="section level2">
+<h2>Checking Irish grid references</h2>
+<p>The validity of Irish grid references can be checked with the
+function <code>igr_is_valid()</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Sample of valid and invalid Irish grid references</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>igrs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;A16&quot;</span>, <span class="st">&quot;A123678&quot;</span>, <span class="st">&quot;BAD&quot;</span>, <span class="st">&quot;I12&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;B125&quot;</span>, <span class="st">&quot;Z&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="fu">igr_is_valid</span>(igrs)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE  TRUE</span></span></code></pre></div>
+</div>
+<div id="converting-from-irish-grid-references" class="section level2">
+<h2>Converting from Irish grid references</h2>
+<p>To convert a vector of Irish grid references to Irish Grid
+coordinates use <code>igr_to_ig()</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>igrs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;D12&quot;</span>, <span class="st">&quot;J53&quot;</span>, <span class="st">&quot;M5090&quot;</span>, <span class="st">&quot;N876274&quot;</span>, <span class="st">&quot;S1234550000&quot;</span>, <span class="st">&quot;W&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">igr_to_ig</span>(igrs)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; $x</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; [1]      0 310000 350000 150000 287600 212345 100000</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; $y</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [1] 400000 420000 330000 290000 227400 150000      0</span></span></code></pre></div>
+<p>The Irish grid references may have spaces between the grid letter,
+easting and northing:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>igrs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;D 12&quot;</span>, <span class="st">&quot;J 5 3&quot;</span>, <span class="st">&quot;M 50 90&quot;</span>, <span class="st">&quot;N 876 274&quot;</span>, <span class="st">&quot;S 12345 50000&quot;</span>, <span class="st">&quot;W&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">igr_to_ig</span>(igrs)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; $x</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; [1]      0 310000 350000 150000 287600 212345 100000</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; $y</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; [1] 400000 420000 330000 290000 227400 150000      0</span></span></code></pre></div>
+<p>These sample Irish grid references have a mix of precisions. The
+precisions in metres can be returned by supplying a column name for the
+precision data:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">igr_to_ig</span>(igrs, <span class="at">precision =</span> <span class="st">&quot;prec&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; $x</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; [1]      0 310000 350000 150000 287600 212345 100000</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; $y</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; [1] 400000 420000 330000 290000 227400 150000      0</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; $prec</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; [1] 1e+05 1e+04 1e+04 1e+03 1e+02 1e+00 1e+05</span></span></code></pre></div>
+<p>A list or data.frame of Irish grid references can be converted to an
+sf object using <code>st_igr_as_sf()</code>. By default the geometries
+returned are points located at the south west corner of each grid
+reference, and the coordinate reference system is Irish Grid (<a href="https://epsg.io/29903">EPSG:29903</a>):</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>igr_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">igr =</span> igrs)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>points_sf <span class="ot">&lt;-</span> <span class="fu">st_igr_as_sf</span>(igr_df, <span class="st">&quot;igr&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>points_sf</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; Simple feature collection with 7 features and 1 field</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; Geometry type: POINT</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; Dimension:     XY</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 350000 ymax: 420000</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; Projected CRS: TM75 / Irish Grid</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt;             igr              geometry</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; 1             A       POINT (0 4e+05)</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; 2          D 12 POINT (310000 420000)</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; 3         J 5 3 POINT (350000 330000)</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; 4       M 50 90 POINT (150000 290000)</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt; 5     N 876 274 POINT (287600 227400)</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt; 6 S 12345 50000 POINT (212345 150000)</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt; 7             W       POINT (1e+05 0)</span></span></code></pre></div>
+<p>These points can be plotted by the <a href="https://r-tmap.github.io/tmap/">tmap</a> package. A basic outline
+of Ireland and the United Kingdom can be retrieved from the <a href="https://cran.r-project.org/package=maps">maps</a> package.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;maps&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>) <span class="sc">&amp;</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">requireNamespace</span>(<span class="st">&quot;tmap&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">library</span>(maps)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="fu">library</span>(tmap)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  ie_uk_sf <span class="ot">&lt;-</span> maps<span class="sc">::</span><span class="fu">map</span>(<span class="st">&quot;world&quot;</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>    <span class="at">regions =</span> <span class="fu">c</span>(<span class="st">&quot;Ireland&quot;</span>, <span class="st">&quot;UK&quot;</span>),</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>    <span class="at">plot =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>    <span class="at">fill =</span> <span class="cn">TRUE</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>    sf<span class="sc">::</span><span class="fu">st_as_sf</span>(ie_uk) <span class="sc">|&gt;</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>    sf<span class="sc">::</span><span class="fu">st_transform</span>(<span class="dv">29903</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  <span class="fu">tm_shape</span>(points_sf, <span class="at">ext =</span> <span class="fl">1.4</span>) <span class="sc">+</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>    <span class="fu">tm_dots</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;cornflowerblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>    <span class="fu">tm_text</span>(<span class="st">&quot;igr&quot;</span>, <span class="at">ymod =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>    <span class="fu">tm_shape</span>(ie_uk_sf) <span class="sc">+</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>    <span class="fu">tm_borders</span>()</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="data:image/png;base64,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" alt="A map of Ireland with a dot at the south-west corner of each sample grid reference." /></p>
+<p>The Irish grid references can also be converted to polygon
+geometries. Each polygon spans the full extent of a grid reference, so a
+set of grid references of varying precision will result in a set of
+polygons with different sizes.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>polygons_sf <span class="ot">&lt;-</span> <span class="fu">st_igr_as_sf</span>(igr_df, <span class="st">&quot;igr&quot;</span>, <span class="at">polygons =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>polygons_sf</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; Simple feature collection with 7 features and 1 field</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; Geometry type: POLYGON</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; Dimension:     XY</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 360000 ymax: 5e+05</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; Projected CRS: TM75 / Irish Grid</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt;             igr                       geometry</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 1             A POLYGON ((1e+05 5e+05, 1e+0...</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 2          D 12 POLYGON ((320000 430000, 32...</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; 3         J 5 3 POLYGON ((360000 340000, 36...</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; 4       M 50 90 POLYGON ((151000 291000, 15...</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; 5     N 876 274 POLYGON ((287700 227500, 28...</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt; 6 S 12345 50000 POLYGON ((212346 150001, 21...</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="co">#&gt; 7             W POLYGON ((2e+05 1e+05, 2e+0...</span></span></code></pre></div>
+<p>Plotting these polygons:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">exists</span>(<span class="st">&quot;ie_uk_sf&quot;</span>)) {</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="fu">tm_shape</span>(ie_uk_sf, <span class="at">bbox =</span> points_sf, <span class="at">ext =</span> <span class="fl">1.4</span>) <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>    <span class="fu">tm_borders</span>() <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>    <span class="fu">tm_shape</span>(polygons_sf, <span class="at">ext =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>    <span class="fu">tm_polygons</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;cornflowerblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>    <span class="fu">tm_text</span>(<span class="st">&quot;igr&quot;</span>, <span class="at">ymod =</span> <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAGACAMAAAA6QU9cAAAA6lBMVEUAAAAAABcAACgAADgAADoAAGIAAGYAKEkALWIALYoAOjoAOpAAUYoAUbAAZmYAZrYXOlgoAAAoADgoLTgoSWYoctM6AAA6ADo6AGY6FwA6OgA6Ojo6WGY6kNtHAABHADhHLQBHUThHUWJHkfZJZmZYOhdYZmZkLQBkkYpkrvZlfalmAABmADpmAGZmZgBmZklmZlhmZmZmkJBmtv+AUQCAroqAyvaQOgCQOjqQZgCQ2/+ZcjiZytOZyvaykWKyroqyyrCyytOyyva2ZgC2/7a2/9u2///bkDrb////tmb/25D//7b//9v///8Q9G2NAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAQkUlEQVR4nO2dC5vUthWGpySQUkqBNJCkDUlaklJ2aRuVbbZly3VSBu+u///fqWVdrPuRbUmWPed7YMZ3ad6VjmTpSNq1qKB2S0egdiEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAoSAACEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAoSAADFAO5RDKqDF/kA5RPp//Rbh+8qp1jjkOaCj2RQglQfR9xEQlQaEWIAsaNZNXFsFRPQdou8TK9c57mI6EkDu80cPSKQb+3cT9/EjA0Qga5wTEJmmESHMEjfBPkAKHy1OKQG9n6KSgNRiygvIKN+OCJBeTBnhStNk5TQ7glsFpH8Tz0n7tBXDjQKS0VQ+jYPqu4h9UuoIAVkJKEho24DscqoFARmENg/IrlpAgPS9jQNy1bwcgAJJaNuAXFILuIgkhIC0g/YeAtIO2rsISDto7x43IOBdhOpoAelVSLRBQ8S1bwRkR1z/djVUHXc9yNvIaF/S61gBxfJBQN4ruBCQ5wIhBOS5QOhIAUXnsDUDmtaJBAHaTpOrszEs5r5w/9x2AOlvmykfqmnlgJIT2hAgnwvLzKeaB1YKSDEjSTv87WetE1CgFyLlg6nWBEiWP+ZjHIloojPJygGJDxcPfY8oh0eAcly4RkCBvq5+W98ZUxtYMaA+w/Df6khA2mWOuyMDcRxbAaDB9PAkZD2FyJZB7zPiQnIcqx6Qo2/d7IKIyEQbBeROE0YSiqsuxoTsvKZiQL4MowMCmy/auAt819QLKGBPiHWV/2JhmiKC3ggg/deCzTsiWDho9xUrBwQ3oG4WUIjP0LmlFP+BeFYF6Gz3sBQgQrw1Qz2ecwq61IDefP6nmz/PBwRU+eJbgiIBEUf1kyk1oIub/3rwZDag0HWkHdNSplSwQxnR/ydJDOjd07vdv5yAHOMHUjzUq8SAXn/y7P1F9z8jILDgmvDUcoDObr96//Zbr5meD4iAV0x5bDFAbx5QNmdeM53CBsVeMeamYoAu+GB8n5leGFC47uBWUkDcPr/91mem44v5mefH3ud/XlJAr7l59prpxQH5biwEiJpoKmaKqgQUQUi/IiWgN7KK6DPTyWzQdECeW9X2Aa3OWOXLak4+ECHz9XcyoJzDwvMCct9tVLBkfXQqoIyCMQYv2LOaxgvl0OVXH7rP6/Pu8GPv7eYbDGsrmJyC8mlq26jQ/s7H7vPy0T155Or01gfK59OX7WF3LxYQ/0vVBigmF4YvYYDapsPB1Ox2FNDlI5qoDt1mqCCzztUFKM5IRQG6PudJqNk9biggvtdxi2rMFaoJUKQNB67igOR3JwXQ/taHwJuwo9msIkCxLWDABQLMQUk2crPZ3YdaFg3VAyj8w1kdIaaiEALU7D4bG4uVADKrbwEFsljTl/LjVA0goHMi/kGmkW4loMPufjtUcSMfVw2gMKLxgIZiXgA67F6o71mRj6wIUBBRPCFRUVRyU8PqQY+1ANYIyESkZoToPOF41egBHdjxIWHFPbAyQAIENxPEPpMwpKirqgMkSnS2aZxJG07UVRUCGmTyWSIJrQdQSjwjOmfXAiht6hnhPV0zoAlFWPyTYwmtAVCGCTyJhASpYkDCayU9nk0AmuHFEfP0NpZ8pYB8NaFkz49+do2AyOg3yvFBRF9ZISDi2c4VRlj1ASKBvUyBhFQdoCmvX+MHX64XkBXzyH6ykYTimxQrA+SINfxD4oukcc/tVT+gWF+hsWko8rq6AIV6zcF7xhGqD1BUb8J4QuNbmcddXAiQNpVEiNJYQpMqTWM6frIC0sb362eGSwJzGIKHpwJ6//4k1t0tIyAxWik0kl220BvHfdcHT8QDOjmJ9gfMCQg+qzaJhcfkJEtC/V9shMNkPkAxpbPxWkH8bRBRViiyUtmuA1DrmkJhrPU2G/ahMIc8vbyRDiSH4YoRj/M8bOS77egKd0ZA/mGO059oPtBxIPhXGR+hzFkseWtFTIIJBFoToF5Z+iOgp483ZAGtDpA0sxPqTMcBSJgZr7FJyic/oHLL9g1hKtvQCn2gcgNKXZLFhKlvep1p4pT/bX4pQEOBz2uF0yKyQUD2GzJLSNMelgnQ1GasPJoThTyAiPJXXBaQ8gIsPaevTqk3p3CjPqiOnbayANJadxYFpL4QSkCXXypA6IiFJkAoByDdC3NpQFLDAKlhFEeXmh7rXvmmchlpUZtbOocp2xLDwcSxBKBW5K8KAe3/yAevCh0KZzEldjUCujqlgxX2klCzCw0CyturUSUgJtUQXZ8PQ6dM5a0oipJ+vPtFshgMmzogNsaXK1CMFXgXWxQSD5MW5gYgtazXaOnK/aoxYQBS4gj0nzSJXJ8zU8No8Cym7bhU0HkhYQv+6FDpYDGZTPY0JQkjTYeXCXQuVQMoc7CNOoRs792xdSyAJqsYoMVKsjUAWrCYb+cSKgBoSTh9+LPuzg5oaTy1A1ocDwKCNSsOCAgQAgKEgADlL8VyPHSk6uv2UVUBoboBVVATmkMof3vQ0A98fc4bf5sdb+IcuvAatftO9uU14U69+FhMvzV3k6u61wFiYPYCkGzWow1ast1z3230jTfa0XkRmXxnNkAOR9vr8989p7/26m9/54BESx5rsdqLXge6c7jzUTs6MzaT78zWceg4dn1+r2/Ha+78R8xUJzqD5SyZrWhB7z61o+mjE6fCgBrWJSVnquNdeCyrNRqg3QvtaProxKkwIDov79XzlxyQ7MKTiYYe5Qln90I7mj46ccpng+xDHaDr8xddDvu4VzvquiSio2BGeuuAHHGiHVOd1elSjAaoSzFGZtrvdrd+ef5y01nMk4Lay6/+9++XBqAvXea4y4ybNtI+QNfn/+zMEAcke+0cBfrWi3kfoC773FPmWxVdeGqV8Or0Hrc8G68oWod6QA3tpZNZTPbaqZ6C9AWE7QD+gyNiM/nGnA5UI6eVzakqAYkgsjx1pCoGVAWfigHVwadGIy20tIuZEotJKmCDavC4rxmQEAKCVIqQe436qdogoLSBFwS0KKFVAHItSpY7SBn01BuLAnKoGKKp4SwNqFjGWy2g2jMZAgK0LKCSbyArBFT2/WxdgJZoSJsW3jKAFhz3M1aLAFrTmIQlAK1qVAsCArQAoDl8rs9ZP6vsNzqwfqNmJ1cVu3w0TDshVi9WTret3q8LqTygWemn+8X9j5dLYdKuRTEejvU4dmf6jVZdvZjqH/yodACM0uoA/ab3aNBWehSd02zk7uNW9ufrnfuHG/331WndgOYZoI5I75XmAtQva6gNZmaSbkf3+92D9G+LUmlAMw10R+Tq9IU7i+1pSmlu/XJqzKSw52br1g/0qyNYtQ2aD4j6fQx2dnAU5r6fO3OEPF99tjtNWuYuOgZQga5nPbyZ9zMPmuE30tTBVwxlOYnNU6IuD85tdHeaBq7RjYnwClMQ/fmagxGzwuwQ2x5mUpCrF+/v/KXlJmoEILLGLKa4ySpejCyH8bQjTfVB8OE57LCzV2ENx3Z9pVhLf/8fDBc1mWh6Ey6z2EGSuHz0hXxIfApaAFCSFDSMZRhskPBEOyhTTSjrGTeffiMfEg2IRnadgJiDNdVeTCYlfT2bYXopZfViXktk98QDImsrxcqGTMpnscUAraTjcF0JqBcCAlS2bz53ABlCXtq7o/KO56IeZm4+ZQitAJA7ighIyMenTP9qtaOehcLLzuRHVDsgX/zk8dyIKgdEtC/r+NGnIMnHWKyP8K8jt0GSg7ZDtMPZVTEgMVRD7uvLXWQI0RuLacoMiLgxTHIPmvErqwVkYVhoDGK1gBQtOjpzBYDWOlysFKDV8ilUk154YGbtgJYetzor/HI16cU0L/xSNekFVTegxfHMjUH2mvTiqhrQ+vlsPgXNjsDGbdD84LcNKEHoywDq53A1ZixrB8d4fWal3ltFW7jRMQWsc+NXCSZnWgQQc9zdD5NLXZ1SWoNjvLoyI3OM1xdzsqaA9WwkILQIIOb5PTjrNiw5SZdMdWVG7hivTRZoTQHr3fhs9g/IAUht93EBMtdcbHaPVb9dnnL4VdwxXlu40ZoC1rtxY/YUg+kBEb271EWo2d0zjwyA9sIBswclHOO1hRutKWD9Gz/M/TmpAQ0rrIrmehchOmRJmz9yAMQdm/nKjMJpXFu40Z4CNrBRV0VRX4I62MTalVjKDIDN4II5jPXqMOiO8aYh0nAQD6CaXjVGxmWvGB6+2SjjUOiM0rpjvLYUoToFLN0grix2o64sFglI/E5lkk0O6KCO0+kuMxzjzbJeM8mE9BtfdOn2xxv8yI/z54FNCSg2AYlSrDFTkHCM11dmpCnIvXCjWqiTlnQbP33NjpCfvr5PkswDuwQgXvfTshOrB8liSl2ZkZVi2sKN1hSw1JG+qxYSR41xphICGmGB+ncFNfY9IMUxXl2Zkdkg98KNB3XW12+IeWQ+n5Se9hHTSzmmoIoREGabrWGXZB4OZXsEvZ8iz49XXEQytRnkHsziSEHJABXoxmYhZATkymKJABXoKhFBZAPkdotOA6gcnmyAfG6tSQDl5qNl3yyAvDlgDYCMyGdpD/KfSQEoKx/rb5sBUKjaUjsg+9kZGsxC5xIAKssnPaBg/OcDylr/cT06eYti+OwsQLmdHJ0PTwwI+AFzAC00YCFxkyt0fjqgApVD59GyLYrTAS02oKNsg9lkQIvxKdVgJhom4oicUJUG5DFyJQAp41ci08xJT2kAVMhHJHcx7/wZWpNgdBY7kR8UUCkfmgKAjN/Ss1EOjQPEE9FJOR+j3DVpomUGYi9ZMxIQs0a+JtcMKvKqITvlHYHGl2KKjd4YoFZ7JTBeDhAQECACAsIbbYMKAyrSHhQKrXpAdprPB8i5itUUPkUBmS5OGbt9jGBZ2RYDR3vNKA7IdJIr0O2jdJ/DgEw4CwBqNTfLPICGdwtlGoE2ApADzwKA1OpJnn4xM5S4t3krby0HaFA+QKqztMzV4+lsEZDp1KOQ8vMJpKzNATIU8zYf4oOAnEXX8QAC3ubtas+RAQq9zUfAOR5AzHKPhrN5QGo1sfvijajxcI4DkFoPGgln64CMKlFSN+AyKlDMK0JAgByAzm6/6j4vdg+7z3dP7yIgUxc3f6aY/kw5vf32IQIy9ebBk47Md3/9/Fm3TT8QkK4+1by+/d+nT0RqQkC6zjq7c3G3/zpzmqBjB/T69qt3XfLhXwjIUmd43n73jH55TNCxA+rSTZd6xBcCsnX28ILanrO7F24TdPSAXv+2tz2vf/292wQdPaA3v+9tz5sHn7hN0NEDeve0tz3868gBpR71nF9lAa1QCAgQAgKEgAAhIEAICBACAoSAACEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAoSAACEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAoSAACEgQAgorIzT42xCmRceWb0IZrGgMs4ftAn13rUIyC8EFFbOGai2oKxTdG1AWafo2oDk8AcE5NQwPAQBuaQMn0FALiGgsNTxVwjIljY+DQHZQkBh6QMcEZApYwCoBgjlkAII5RUCAoSAACEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAoSAACEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAvR/7CSsO7QtuvsAAAAASUVORK5CYII=" alt="A map of Ireland with polygons spanning each sample grid reference. The polygons range in size from 100 km square to 1 m square." /></p>
+</div>
+<div id="ignoring-invalid-irish-grid-references" class="section level2">
+<h2>Ignoring invalid Irish grid references</h2>
+<p>To be consistent with the behaviour of <code>sf::st_as_sf()</code>,
+an error is returned if any of the Irish grid references supplied to
+<code>st_igr_as_sf()</code> are invalid. To avoid this scenario, any
+invalid Irish grid references can be filtered out using
+<code>igr_is_valid()</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>some_invalid_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">igr =</span> <span class="fu">c</span>(igrs, <span class="st">&quot;BAD&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;123&quot;</span>, <span class="st">&quot;N1&quot;</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>some_invalid_df</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt;              igr</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; 1              A</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; 2           D 12</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; 3          J 5 3</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; 4        M 50 90</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; 5      N 876 274</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; 6  S 12345 50000</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; 7              W</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; 8            BAD</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; 9              I</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; 10              </span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; 11           123</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; 12            N1</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>valid_sf <span class="ot">&lt;-</span> <span class="fu">st_igr_as_sf</span>(some_invalid_df[<span class="fu">igr_is_valid</span>(some_invalid_df<span class="sc">$</span>igr), , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a>valid_sf</span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; Simple feature collection with 7 features and 1 field</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt; Geometry type: POINT</span></span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt; Dimension:     XY</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 350000 ymax: 420000</span></span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt; Projected CRS: TM75 / Irish Grid</span></span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co">#&gt;             igr              geometry</span></span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a><span class="co">#&gt; 1             A       POINT (0 4e+05)</span></span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="co">#&gt; 2          D 12 POINT (310000 420000)</span></span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a><span class="co">#&gt; 3         J 5 3 POINT (350000 330000)</span></span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a><span class="co">#&gt; 4       M 50 90 POINT (150000 290000)</span></span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a><span class="co">#&gt; 5     N 876 274 POINT (287600 227400)</span></span>
+<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a><span class="co">#&gt; 6 S 12345 50000 POINT (212345 150000)</span></span>
+<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a><span class="co">#&gt; 7             W       POINT (1e+05 0)</span></span></code></pre></div>
+<p>In tidy r this can be written as:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>valid_df <span class="ot">&lt;-</span> some_invalid_df <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">igr_is_valid</span>(igr)) <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">st_igr_as_sf</span>()</span></code></pre></div>
+</div>
+<div id="converting-to-irish-grid-references" class="section level2">
+<h2>Converting to Irish grid references</h2>
+<p>Irish Grid coordinates can be converted to Irish grid references
+using <code>ig_to_igr()</code>. The first two columns in the matrix
+supplied must be the Irish Grid X coordinate and Y coordinate
+respectively. Any other columns are ignored.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">490000</span>, <span class="dv">400000</span>, <span class="dv">0</span>, <span class="dv">453000</span>, <span class="dv">4000</span>), <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">colnames</span>(p) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>p</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt;           x      y</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; [1,]      0 490000</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; [2,] 400000      0</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; [3,] 453000   4000</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="fu">ig_to_igr</span>(p)</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A000900&quot; &quot;Z000000&quot; &quot;Z530040&quot;</span></span></code></pre></div>
+<p>Spaces or other strings can be inserted between the letter, easting
+and northing:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">ig_to_igr</span>(p, <span class="at">sep =</span> <span class="st">&quot; &quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A 000 900&quot; &quot;Z 000 000&quot; &quot;Z 530 040&quot;</span></span></code></pre></div>
+<p>The generated Irish grid references can be limited to a particular
+precision by specifying the number of digits for both easting and
+northing. Between 0 (for 100 km precision) and 5 (for 1 m precision)
+digits are supported.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">ig_to_igr</span>(p, <span class="at">digits =</span> <span class="dv">1</span>) <span class="co"># 10 km precision</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A09&quot; &quot;Z00&quot; &quot;Z50&quot;</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="fu">ig_to_igr</span>(p, <span class="at">digits =</span> <span class="dv">5</span>) <span class="co"># 1 m precision</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A0000090000&quot; &quot;Z0000000000&quot; &quot;Z5300004000&quot;</span></span></code></pre></div>
+<p>Precision can also be specified number of metres. Multiples of 10
+from 1 m to 100,000 m (100 km) are supported. Any value supplied for
+<code>precision</code> overrides any values for <code>digits</code>.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">ig_to_igr</span>(p, <span class="at">precision =</span> <span class="dv">10000</span>) <span class="co"># 10 km precision</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A09&quot; &quot;Z00&quot; &quot;Z50&quot;</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="fu">ig_to_igr</span>(p, <span class="at">precision =</span> <span class="dv">1</span>) <span class="co"># 1 m precision</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A0000090000&quot; &quot;Z0000000000&quot; &quot;Z5300004000&quot;</span></span></code></pre></div>
+<p>A data.frame of Irish Grid coordinates can be converted:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>p_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(p)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>p_df</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co">#&gt;        x      y</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co">#&gt; 1      0 490000</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co">#&gt; 2 400000      0</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co">#&gt; 3 453000   4000</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="fu">ig_to_igr</span>(p_df)</span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A000900&quot; &quot;Z000000&quot; &quot;Z530040&quot;</span></span></code></pre></div>
+<p>An sf object containing geometries of type POINT can be converted to
+Irish grid references using <code>st_irishgridrefs()</code>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>p_sf <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_as_sf</span>(p_df,</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>  <span class="at">crs =</span> <span class="dv">29903</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>)</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>p_sf</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; Simple feature collection with 3 features and 0 fields</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="co">#&gt; Geometry type: POINT</span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co">#&gt; Dimension:     XY</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="co">#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 453000 ymax: 490000</span></span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="co">#&gt; Projected CRS: TM75 / Irish Grid</span></span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="co">#&gt;              geometry</span></span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="co">#&gt; 1    POINT (0 490000)</span></span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a><span class="co">#&gt; 2     POINT (4e+05 0)</span></span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a><span class="co">#&gt; 3 POINT (453000 4000)</span></span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="fu">st_irishgridrefs</span>(p_sf)</span>
+<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A000900&quot; &quot;Z000000&quot; &quot;Z530040&quot;</span></span></code></pre></div>
+<p>To append Irish grid references (with spaces) to the original sf
+object using base r:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>p_sf<span class="sc">$</span>igr <span class="ot">&lt;-</span> <span class="fu">st_irishgridrefs</span>(p_sf, <span class="at">sep =</span> <span class="st">&quot; &quot;</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>p_sf</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">#&gt; Simple feature collection with 3 features and 1 field</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt; Geometry type: POINT</span></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; Dimension:     XY</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 453000 ymax: 490000</span></span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a><span class="co">#&gt; Projected CRS: TM75 / Irish Grid</span></span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a><span class="co">#&gt;              geometry       igr</span></span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a><span class="co">#&gt; 1    POINT (0 490000) A 000 900</span></span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a><span class="co">#&gt; 2     POINT (4e+05 0) Z 000 000</span></span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a><span class="co">#&gt; 3 POINT (453000 4000) Z 530 040</span></span></code></pre></div>
+<p>In tidy r this can be written as:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>p_sf <span class="ot">&lt;-</span> p_sf <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">igr =</span> <span class="fu">st_irishgridrefs</span>(<span class="at">sep =</span> <span class="st">&quot; &quot;</span>))</span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
