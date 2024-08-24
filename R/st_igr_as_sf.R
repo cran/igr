@@ -31,7 +31,7 @@
 #'
 #' @examples
 #' # A data.frame containing two Irish grid references
-#' x <- data.frame(igr = c("A00", "N8000"))
+#' x <- data.frame(igr = c("A00", "N8000", "D12T"))
 #'
 #' # Convert a data.frame of Irish grid references to an sf object in the
 #' # Irish Grid coordinate reference system
@@ -45,7 +45,7 @@
 #'
 #' # Convert into polygon features rather than point features
 #' st_igr_as_sf(x, "igr", polygons = TRUE)
-#' 
+#'
 st_igr_as_sf <- function(
     x,
     igrefs = "igr",
@@ -53,8 +53,13 @@ st_igr_as_sf <- function(
     remove = FALSE,
     add_coords = FALSE,
     coords = c("x", "y"),
+    centroids = FALSE,
     precision = NULL,
-    polygons = FALSE) {
+    polygons = FALSE,
+    tetrad = TRUE) {
+  if (!inherits(x, "data.frame")) {
+    stop_custom("not_df", "x must be a data.frame object")
+  }
   # if x includes column names in coords then stop
   coords_existing <- intersect(colnames(x), coords)
   if (length(coords_existing) > 0) {
@@ -70,7 +75,7 @@ st_igr_as_sf <- function(
   if (is.null(x[[igrefs]])) {
     stop_custom("missing_igrefs", paste("igrefs column", igrefs, "does not exist."))
   }
-  
+
   if (polygons) {
     igr_precision <- "prec"
   } # grid reference precision is required
@@ -82,7 +87,13 @@ st_igr_as_sf <- function(
   # raise as error
   tryCatch(
     {
-      ig <- igr_to_ig(x[[igrefs]], coords = coords, precision = igr_precision)
+      ig <- igr_to_ig(
+        x[[igrefs]],
+        coords = coords,
+        centroids = centroids,
+        precision = igr_precision,
+        tetrad = tetrad
+      )
     },
     warning = function(w) {
       stop_custom(
@@ -96,7 +107,8 @@ st_igr_as_sf <- function(
   )
 
   if (polygons) {
-    # calculate centre of square of each grid reference
+    # calculate centre of square of each grid reference. Cannot calculate it in 
+    # call to igr_to_ig() in case add_coords is TRUE and centroids is FALSE
     ig[[1]] <- ig[[1]] + (ig[[3]] / 2) # x = x + 1/2 resolution
     ig[[2]] <- ig[[2]] + (ig[[3]] / 2) # y = y + 1/2 resolution
 
@@ -110,7 +122,7 @@ st_igr_as_sf <- function(
       # remove precision column
       res_sf <- res_sf[, !names(res_sf) == "prec"]
     } else {
-      # rename res column
+      # rename precision column
       names(res_sf)[names(res_sf) == "prec"] <- precision
     }
   } else {

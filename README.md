@@ -7,7 +7,8 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-<!-- [![CRAN status](https://www.r-pkg.org/badges/version/igr)](https://CRAN.R-project.org/package=igr) -->
+[![CRAN
+status](https://www.r-pkg.org/badges/version/igr)](https://CRAN.R-project.org/package=igr)
 [![R-CMD-check](https://github.com/digitalnature-ie/igr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/digitalnature-ie/igr/actions/workflows/R-CMD-check.yaml)
 [![test-coverage](https://github.com/digitalnature-ie/igr/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/digitalnature-ie/igr/actions/workflows/test-coverage.yaml)
 [![Codecov test
@@ -17,29 +18,33 @@ coverage](https://codecov.io/gh/digitalnature-ie/igr/branch/main/graph/badge.svg
 Convert between Irish grid references and Irish Grid coordinates or an
 sf object.
 
-An Irish grid reference consists of a letter, optionally followed by an
-easting and northing. Each Irish grid reference refers to a square on
-the Irish Grid ([EPSG:29903](https://epsg.io/29903)). A letter alone
-(e.g. “N”) refers to a particular 100 km square. An Irish grid reference
-with a 1-digit easting and northing (e.g. “N85”) refers to a 10 km
-square. A 5-digit easting and northing (e.g. “N 12345 67890”) refers to
-a 1 m square.
+An Irish grid reference is a way of referring to a square of some size
+on the Irish Grid geographic coordinate system
+([EPSG:29903](https://epsg.io/29903)). Rather than an X and Y
+coordinate, an Irish grid reference consists of a letter, optionally
+followed by an easting, northing and possibly a final letter. The size
+of the square referred to - the precision of the Irish grid reference -
+is defined by the number of digits in the easting and northing and
+presence or absence of a final letter. Examples include “N” - referring
+to a particular 100 km square, “N16” - referring to a particular 10 km
+square within “N”, “N16K” - the tetrad form of grid reference referring
+to a particular 2 km square within “N16”, and “N 12345 67890” -
+referring to a particular 1 m square. Spaces between letters, easting
+and northing in an Irish grid reference are optional.
 
-This package supports Irish grid references of 1 m, 10 m, 100 m, 1 km,
-10 km and 100 km precision. Irish grid references can be of mixed
-precision, and whitespace between letter, easting and northing is
-optional.
+This package supports Irish grid references of 1 m, 10 m, 100 m, 1 km, 2
+km, 10 km and 100 km precision. Datasets containing a mix of precision
+are supported.
 
-When converting Irish grid references to point locations (using
-`igr_to_ig()`, or `st_igr_as_sf()` with the default `polygons=FALSE`),
-the south west corners of the relevant Irish Grid squares are returned.
-When converting to polygons (using `st_igr_as_sf()` with
-`polygons=TRUE`), the polygons returned span the entire square of each
-grid reference.
+Irish grid references can be converted to and from Irish Grid
+coordinates (X and Y), or to and from sf
+[sf](https://r-spatial.github.io/sf/) (simple feature) objects in any
+coordinate reference system.
 
-The functions `st_igr_as_sf()` and `st_irishgridrefs()` convert to and
-from [sf](https://r-spatial.github.io/sf/) (simple feature) objects in
-any coordinate reference system.
+Irish grid references can be converted to point locations or polygons.
+Point locations can be either the south-west corner or the centroid of
+each Irish grid reference. Polygons each span the entire extent of an
+Irish grid reference - the size of each polygon is precision-aware.
 
 ## Installation
 
@@ -86,31 +91,40 @@ To convert to Irish grid references:
 library(igr)
 
 # Sample grid references
-igrs <- c("A", "A16", "A123678", "BAD", "I12", "", "B125", "Z")
+igrs <- c("A", "A16", "A123678", "BAD", "I12", "", "B125", "Z", "N12D")
 
 igr_is_valid(igrs)
-#> [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE  TRUE
+#> [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE  TRUE  TRUE
 ```
 
 ### Convert from Irish grid references
 
 ``` r
 # Sample grid references
-igrs <- c("A", "D12", "J53", "M5090", "N876274", "S1234550000", "W")
+igrs <- c("A", "D12", "J53", "M5090", "N876274", "S1234550000", "R10H", "X")
 
-# Converting to Irish Grid coordinates
+# Converting south west corners of Irish grid references to Irish Grid coordinates
 igr_to_ig(igrs)
 #> $x
-#> [1]      0 310000 350000 150000 287600 212345 100000
+#> [1]      0 310000 350000 150000 287600 212345 112000 200000
 #> 
 #> $y
-#> [1] 400000 420000 330000 290000 227400 150000      0
+#> [1] 400000 420000 330000 290000 227400 150000 104000      0
+
+# Converting centroids of Irish grid references to Irish Grid coordinates
+igr_to_ig(igrs, centroids = TRUE)
+#> $x
+#> [1]  50000.0 315000.0 355000.0 150500.0 287650.0 212345.5 113000.0 250000.0
+#> 
+#> $y
+#> [1] 450000.0 425000.0 335000.0 290500.0 227450.0 150000.5 105000.0  50000.0
+
 # Sample grid references in a data.frame
 igrs_df <- data.frame(igr = igrs)
 
 # Converting to an sf object of POINT features
 st_igr_as_sf(igrs_df, "igr")
-#> Simple feature collection with 7 features and 1 field
+#> Simple feature collection with 8 features and 1 field
 #> Geometry type: POINT
 #> Dimension:     XY
 #> Bounding box:  xmin: 0 ymin: 0 xmax: 350000 ymax: 420000
@@ -122,15 +136,16 @@ st_igr_as_sf(igrs_df, "igr")
 #> 4       M5090 POINT (150000 290000)
 #> 5     N876274 POINT (287600 227400)
 #> 6 S1234550000 POINT (212345 150000)
-#> 7           W       POINT (1e+05 0)
+#> 7        R10H POINT (112000 104000)
+#> 8           X       POINT (2e+05 0)
 ```
 
-<img src="man/figures/README-example-igr-points-1.png" alt="A map of Ireland with a dot at the south-west corner of each sample grid reference." width="100%" />
+<img src="man/figures/README-example-igr-points-1.png" alt="A map of Ireland with a dot at the south west corner of each sample grid reference." width="100%" />
 
 ``` r
 # Converting to an sf object of POLYGON features
 st_igr_as_sf(igrs_df, "igr", polygon = TRUE)
-#> Simple feature collection with 7 features and 1 field
+#> Simple feature collection with 8 features and 1 field
 #> Geometry type: POLYGON
 #> Dimension:     XY
 #> Bounding box:  xmin: 0 ymin: 0 xmax: 360000 ymax: 5e+05
@@ -142,7 +157,8 @@ st_igr_as_sf(igrs_df, "igr", polygon = TRUE)
 #> 4       M5090 POLYGON ((151000 291000, 15...
 #> 5     N876274 POLYGON ((287700 227500, 28...
 #> 6 S1234550000 POLYGON ((212346 150001, 21...
-#> 7           W POLYGON ((2e+05 1e+05, 2e+0...
+#> 7        R10H POLYGON ((114000 106000, 11...
+#> 8           X POLYGON ((3e+05 1e+05, 3e+0...
 ```
 
 <img src="man/figures/README-example-igr-polygons-1.png" alt="A map of Ireland with polygons spanning each sample grid reference. The polygons range in size from 100 km square to 1 m square." width="100%" />
@@ -159,9 +175,11 @@ p
 #> [1,]      0 490000
 #> [2,] 400000      0
 #> [3,] 453000   4000
+
 # Convert to Irish grid references
 ig_to_igr(p)
 #> [1] "A000900" "Z000000" "Z530040"
+
 # Sample Irish Grid coordinates in an sf object
 p_sf <- sf::st_as_sf(data.frame(p), crs = 29903, coords = c("x", "y"))
 

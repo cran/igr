@@ -11,8 +11,10 @@ st_igr_as_sf(
   remove = FALSE,
   add_coords = FALSE,
   coords = c("x", "y"),
+  centroids = FALSE,
   precision = NULL,
-  polygons = FALSE
+  polygons = FALSE,
+  tetrad = TRUE
 )
 }
 \arguments{
@@ -35,6 +37,9 @@ specified by \code{coords} be included in the result?}
 \item{coords}{A character vector of the names of the columns to contain the
 Irish Grid X and Y coordinates respectively.}
 
+\item{centroids}{Should the coordinates of the centroids of the Irish grid
+references be returned (rather than the south west corners)?}
+
 \item{precision}{The name of the column to contain the precision of each
 Irish grid reference in metres, if required.}
 
@@ -42,6 +47,8 @@ Irish grid reference in metres, if required.}
 features located at the south-west corner of each Irish grid reference. If
 \code{TRUE} the result will contain polygon features spanning the extent of each
 Irish grid reference.}
+
+\item{tetrad}{Permit tetrad form of Irish grid reference?}
 }
 \value{
 An sf object containing point or polygon features for each Irish grid
@@ -58,7 +65,7 @@ also be returned.
 }
 \examples{
 # A data.frame containing two Irish grid references
-x <- data.frame(igr = c("A00", "N8000"))
+x <- data.frame(igr = c("A00", "N8000", "D12T"))
 
 # Convert a data.frame of Irish grid references to an sf object in the
 # Irish Grid coordinate reference system
