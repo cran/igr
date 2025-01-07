@@ -1,6 +1,6 @@
 Package: igr
 Title: Irish Grid Reference Utilities
-Version: 0.2.0
+Version: 1.0.0
 Authors@R: c(
     person("John", "Kennedy", , "john@digitalnature.ie", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0002-1128-987X")),
@@ -21,9 +21,9 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2024-08-24 21:22:13 UTC; jkenn
+Packaged: 2025-01-07 17:09:30 UTC; jkenn
 Author: John Kennedy [aut, cre, cph] (<https://orcid.org/0000-0002-1128-987X>),
   Digital Nature [fnd]
 Maintainer: John Kennedy <john@digitalnature.ie>
 Repository: CRAN
-Date/Publication: 2024-08-24 22:50:03 UTC
+Date/Publication: 2025-01-07 17:40:02 UTC

@@ -1,3 +1,9 @@
+# igr 1.0.0
+
+* `ig_to_igr()` no longer appends separators when converting to 100 km resolution Irish grid references (#13).
+* Documentation refinements.
+* Package considered feature complete and API stable: lifecycle promoted to "stable".
+
 # igr 0.2.0
 
 * All functions now support tetrads (2 km squares, also known as "DINTY" system, e.g. "N85H") (#3).

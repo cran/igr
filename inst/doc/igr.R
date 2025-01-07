@@ -36,6 +36,11 @@ points_sf <- st_igr_as_sf(igr_df, "igr")
 
 points_sf
 
+## ----example-igr-poi-wgs84----------------------------------------------------
+points_sf <- st_igr_as_sf(igr_df, "igr", crs = 4326)
+
+points_sf
+
 ## ----example-igr-poi-plot, fig.height=4, message=FALSE, fig.alt="A map of Ireland with a dot at the south west corner of each sample grid reference."----
 if (requireNamespace("maps", quietly = TRUE) &
   requireNamespace("tmap", quietly = TRUE) &
@@ -112,9 +117,9 @@ valid_sf <- st_igr_as_sf(some_invalid_df[igr_is_valid(some_invalid_df$igr), , dr
 valid_sf
 
 ## ----example-igr-avoid-tidyr, eval=FALSE--------------------------------------
-#  valid_sf <- some_invalid_df |>
-#    dplyr::filter(igr_is_valid(igr)) |>
-#    st_igr_as_sf()
+# valid_sf <- some_invalid_df |>
+#   dplyr::filter(igr_is_valid(igr)) |>
+#   st_igr_as_sf()
 
 ## ----example-ig-1-------------------------------------------------------------
 p <- matrix(c(0, 490000, 400000, 0, 453000, 4000), ncol = 2, byrow = TRUE)
@@ -159,6 +164,6 @@ p_sf$igr <- st_irishgridrefs(p_sf, sep = " ")
 p_sf
 
 ## ----example-ig-7, eval = FALSE-----------------------------------------------
-#  p_sf <- p_sf |>
-#    dplyr::mutate(igr = st_irishgridrefs(sep = " "))
+# p_sf <- p_sf |>
+#   dplyr::mutate(igr = st_irishgridrefs(sep = " "))
 
