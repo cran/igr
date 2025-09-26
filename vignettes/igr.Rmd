@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The Irish Grid ([EPSG:29903](https://epsg.io/29903)) is a coordinate reference system spanning the island of Ireland. Created by the Ordnance Survey Ireland (now [Tailte Éireann](https://www.tailte.ie)) and [Ordnance Survey of Northern Ireland](https://www.nidirect.gov.uk/campaigns/ordnance-survey-of-northern-ireland), locations within the Irish Grid are defined by an X and Y coordinate.
+The Irish Grid ([EPSG:29903](https://epsg.io/29903)) is a coordinate reference system spanning the island of Ireland. Created by the Ordnance Survey Ireland (now [Tailte Éireann](https://tailte.ie)) and [Ordnance Survey of Northern Ireland](https://www.nidirect.gov.uk/campaigns/ordnance-survey-of-northern-ireland), locations within the Irish Grid are defined by an X and Y coordinate.
 
 Irish grid references are an alternative way of referring to locations on the Irish Grid. An Irish grid reference consists of a letter, optionally followed by an easting, northing and possibly a final letter. The first letter (e.g. "N") refers to a particular 100 km square on the Irish Grid. There are 25 such 100 km squares - the letter "I" is skipped. The easting and northing refer to a square within the 100 km square. An Irish grid reference with a 1-digit easting and northing (e.g. "N16") refers to a particular 10 km square wtihin the 100 km square "N". A 5-digit easting and northing (e.g. "N 12345 67890") refers to a particular 1 m square. The tetrad form of Irish grid reference consists of a 10 km square reference followed by a letter (e.g. "N16K"). This refers to a particular 2 km square. There are 25 tetrads in a 10 km square - the letter "O" is not used.
 
@@ -110,7 +110,7 @@ points_sf
 
 These points can be plotted by the [tmap](https://r-tmap.github.io/tmap/) package. A basic outline of Ireland and the United Kingdom can be retrieved from the [maps](https://cran.r-project.org/package=maps) package.
 
-```{r example-igr-poi-plot, fig.height=4, message=FALSE, fig.alt="A map of Ireland with a dot at the south west corner of each sample grid reference."}
+```{r example-igr-poi-plot, message=FALSE, fig.alt="A map of Ireland with a dot at the south west corner of each sample grid reference."}
 if (requireNamespace("maps", quietly = TRUE) &
   requireNamespace("tmap", quietly = TRUE) &
   requireNamespace("units", quietly = TRUE)) {
@@ -126,19 +126,11 @@ if (requireNamespace("maps", quietly = TRUE) &
     sf::st_as_sf(ie_uk) |>
     sf::st_transform(29903)
 
-  if (packageVersion("tmap") > "3.99") {
-    tm_shape(points_sf, ext = 1.4) +
-      tm_dots(size = 1, fill = "cornflowerblue") +
-      tm_text("igr", ymod = 1) +
-      tm_shape(ie_uk_sf) +
-      tm_borders()
-  } else {
-    tm_shape(points_sf, ext = 1.4) +
-      tm_dots(size = 1, col = "cornflowerblue") +
-      tm_text("igr", ymod = 1) +
-      tm_shape(ie_uk_sf) +
-      tm_borders()
-  }
+  tm_shape(points_sf, ext = 1.4) +
+    tm_dots(size = 1, fill = "cornflowerblue") +
+    tm_text("igr", ymod = 1) +
+    tm_shape(ie_uk_sf) +
+    tm_borders()
 }
 ```
 
@@ -152,35 +144,22 @@ polygons_sf
 
 Plotting these polygons:
 
-```{r  example-igr-pol-plot, fig.height=4, fig.alt="A map of Ireland with polygons spanning each sample grid reference. The polygons range in size from 100 km square to 1 m square."}
+```{r  example-igr-pol-plot, fig.alt="A map of Ireland with polygons spanning each sample grid reference. The polygons range in size from 100 km square to 1 m square."}
 if (exists("ie_uk_sf")) {
   # identify small polygons requiring highlighting
   polygons_sf$area <- sf::st_area(polygons_sf)
   small_polygons_sf <- polygons_sf[polygons_sf$area <= units::set_units(5000000, m^2), ]
 
-  if (packageVersion("tmap") > "3.99") {
-    tm_shape(ie_uk_sf, bbox = points_sf, ext = 1.4) +
-      tm_borders() +
-      tm_shape(polygons_sf) +
-      tm_polygons(size = 1, fill = "cornflowerblue", fill_alpha = 0.5) +
-      tm_text("igr", ymod = -1) +
-      tm_shape(small_polygons_sf) +
-      tm_bubbles(
-        fill_alpha = 0, col = "orangered", lwd = 2,
-        size = 0.8
-      )
-  } else {
-    tm_shape(ie_uk_sf, bbox = points_sf, ext = 1.4) +
-      tm_borders() +
-      tm_shape(polygons_sf) +
-      tm_polygons(size = 1, col = "cornflowerblue", alpha = 0.5) +
-      tm_text("igr", ymod = -1) +
-      tm_shape(small_polygons_sf) +
-      tm_bubbles(
-        alpha = 0, border.col = "orangered", border.lwd = 2,
-        size = 0.8
-      )
-  }
+  tm_shape(ie_uk_sf, bbox = points_sf, ext = 1.4) +
+    tm_borders() +
+    tm_shape(polygons_sf) +
+    tm_polygons(fill = "cornflowerblue", fill_alpha = 0.5) +
+    tm_text("igr", ymod = -1) +
+    tm_shape(small_polygons_sf) +
+    tm_bubbles(
+      fill_alpha = 0, col = "orangered", lwd = 2,
+      size = 0.8
+    )
 }
 ```
 
